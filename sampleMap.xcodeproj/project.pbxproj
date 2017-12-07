@@ -13,7 +13,6 @@
 		1242B5281FBDFAA300701587 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1242B5271FBDFAA300701587 /* Assets.xcassets */; };
 		1242B52B1FBDFAA300701587 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1242B5291FBDFAA300701587 /* LaunchScreen.storyboard */; };
 		1242B5341FBDFD2800701587 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1242B5331FBDFD2800701587 /* MapKit.framework */; };
-		12901E721FC464B7003ED7A3 /* GPX in Resources */ = {isa = PBXBuildFile; fileRef = 12901E711FC464B7003ED7A3 /* GPX */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +24,6 @@
 		1242B52A1FBDFAA300701587 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1242B52C1FBDFAA300701587 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1242B5331FBDFD2800701587 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		12901E711FC464B7003ED7A3 /* GPX */ = {isa = PBXFileReference; lastKnownFileType = folder; name = GPX; path = ../../Ekino/Dropbox/APRR/GPX; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +41,7 @@
 		1242B5141FBDFAA300701587 = {
 			isa = PBXGroup;
 			children = (
-				12901E711FC464B7003ED7A3 /* GPX */,
+				BAE7456D1FD93F960031ECDA /* GPX */,
 				1242B51F1FBDFAA300701587 /* sampleMap */,
 				1242B51E1FBDFAA300701587 /* Products */,
 				1242B5321FBDFD2800701587 /* Frameworks */,
@@ -77,6 +75,13 @@
 				1242B5331FBDFD2800701587 /* MapKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BAE7456D1FD93F960031ECDA /* GPX */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = GPX;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,7 +150,6 @@
 			files = (
 				1242B52B1FBDFAA300701587 /* LaunchScreen.storyboard in Resources */,
 				1242B5281FBDFAA300701587 /* Assets.xcassets in Resources */,
-				12901E721FC464B7003ED7A3 /* GPX in Resources */,
 				1242B5261FBDFAA300701587 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

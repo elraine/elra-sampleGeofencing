@@ -27,6 +27,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
     
     var distanceToAllRegions:[CLLocationDistance] = []{
         didSet{
+            guard !distanceToAllRegions.isEmpty else{return}
             distanceLabel.text = String(describing: distanceToAllRegions.min()!.rounded())
         }
         
@@ -53,14 +54,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
         let shortRadius:CLLocationDistance = 500
         let longRadius:CLLocationDistance = 12000
         let regions: [CLCircularRegion] = [
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:46.0404651,longitude:4.7249787), radius: shortRadius, identifier: "Boitray"),
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:46.1354872,longitude:4.765138), radius: shortRadius, identifier: "Taponas"),
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:46.7524567,longitude:2.41487039), radius: shortRadius, identifier: "Farges Allichamps"),
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:46.0585033, longitude:3.11161905), radius: shortRadius, identifier: "Volcan d'Auvergne"),
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:48.6110603, longitude:2.6344658), radius: shortRadius, identifier: "Aire de Galande la Mare-Laroche"),
-// 12km regions
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:47.9732621, longitude:3.19782476), radius: longRadius, identifier: "Aire de la Reserve"),
-            CLCircularRegion(center: CLLocationCoordinate2D(latitude:48.1666969, longitude:3.17163347), radius: longRadius, identifier: "Aire de Villeroy")
+            CLCircularRegion(center: CLLocationCoordinate2D(latitude:44.8399503,longitude:-0.5706387), radius: shortRadius, identifier: "Lieu dit Vin"),
         ]
         allRegions = regions
         
@@ -75,22 +69,37 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
         
     }
     @IBAction func resetButtonAction(_ sender: UIButton) {
-//        locationManager()
-        print("hi")
-        
+        checkLocationAuthorizationStatus()
     }
     
     func checkLocationAuthorizationStatus() {
         if CLLocationManager.authorizationStatus() == .authorizedAlways {
             mapView.showsUserLocation = true
         } else {
+            showLocationSettingsAlert()
             locationManager.requestAlwaysAuthorization()
         }
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10.0  // In meters.
         locationManager.delegate = self
         locationManager.startUpdatingLocation()
+    }
+    
+    func showLocationSettingsAlert() {
+        let alertController = UIAlertController(title: "😢",
+                                                message: "The location permission was not authorized. Please enable it in Settings to continue.",
+                                                preferredStyle: .alert)
         
+        let settingsAction = UIAlertAction(title: "Settings", style: .default) { (alertAction) in
+            if let appSettings = URL(string: UIApplicationOpenSettingsURLString) {
+                UIApplication.shared.open(appSettings)
+            }
+        }
+        alertController.addAction(settingsAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
     }
     
     func checkMotionAuthorizationStatus(){
@@ -109,26 +118,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         currentRegionLabel.text = "outside"
-        monitorRegionAtLocation()
-        self.view.bringSubview(toFront: resetButton)
-        
-        let initialLocation = CLLocation(latitude: 21.282778, longitude: -157.829444)
-        centerMapOnLocation(location: initialLocation)
-        mapView.showsUserLocation = true
-        mapView.setUserTrackingMode(MKUserTrackingMode.follow, animated: true)
-        
-        // Do any additional setup after loading the view, typically from a nib.
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        resetButton.setTitle("get Location", for: .normal)
         checkLocationAuthorizationStatus()
         checkMotionAuthorizationStatus()
         guard let lll = locationManager.location else{
             return
         }
-        motionManager.
         addRadiusCircle(location:lll)
+        monitorRegionAtLocation()
+        
+        self.view.bringSubview(toFront: resetButton)
+        
+        let initialLocation = CLLocation(latitude: 21.282778, longitude: -157.829444)
+        centerMapOnLocation(location: initialLocation)
+        mapView.showsUserLocation = true
+        mapView.userTrackingMode = .follow
+//        mapView.setUserTrackingMode(MKUserTrackingMode.follow, animated: true)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
     }
     
     override func didReceiveMemoryWarning() {
@@ -152,42 +162,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate,MKMapViewDeleg
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]){
-        
         distanceToAllRegions =  self.allRegions.map(){
             (regi) -> CLLocationDistance in
             return (locations.last?.distance(from: CLLocation(latitude: regi.center.latitude, longitude: regi.center.longitude)))!
         }
         let lastLocation = self.lastLocation
-        if let spd = locations.last?.speed{
-            if (spd < 0) {
-                // A negative value indicates an invalid speed. Try calculate manually.
-                guard let currentLocation = locations.last else{
-                    return
-                }
-                
-                let t:TimeInterval = currentLocation.timestamp.timeIntervalSince(lastLocation.timestamp)
-//                print("time " + String(t))
-                if (Double(t) <= 0) {
-                    // If there are several location manager work at the same time, an outdated cache location may returns and should be ignored.
-                    return;
-                }
-                
-                let distanceFromLast:CLLocationDistance = lastLocation.distance(from: currentLocation)
-                if (distanceFromLast < 1
-                    || t < 1) {
-                    // Optional, dont calculate if two location are too close. This may avoid gets unreasonable value.
-                    return;
-                }
-//                print("distance " + String(distanceFromLast))
-                self.speed = Double(distanceFromLast)/(3.6*t)
-//                print("speed " + String(self.speed))
-                self.lastLocation = currentLocation
-            }
-        }
-        
     }
     
     func addRadiusCircle(location: CLLocation){
+        //not working
         self.mapView.delegate = self
         let circle = MKCircle(center: location.coordinate, radius: 100 as CLLocationDistance)
         self.mapView.add(circle)
